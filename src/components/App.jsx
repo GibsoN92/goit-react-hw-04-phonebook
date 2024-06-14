@@ -1,20 +1,27 @@
 import React, { Component } from "react";
 import css from "./App.module.scss";
-import { nanoid } from "nanoid";
 import ContactForm from "./ContactForm/ContactForm";
 import Filter from "./Filter/Filter";
 import ContactList from "./ContactList/ContactList";
 
 class App extends Component {
   state = {
-    contacts: [
-      { id: nanoid(), name: "Rosie Simpson", number: "459-12-56" },
-      { id: nanoid(), name: "Hermione Kline", number: "443-89-12" },
-      { id: nanoid(), name: "Eden Clements", number: "645-17-79" },
-      { id: nanoid(), name: "Annie Copeland", number: "227-91-26" },
-    ],
+    contacts: [],
     filter: "",
   };
+
+  componentDidMount() {
+    const storedContacts = localStorage.getItem("contacts");
+    if (storedContacts) {
+      this.setState({ contacts: JSON.parse(storedContacts) });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.contacts !== this.state.contacts) {
+      localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
+    }
+  }
 
   checkContact = (newContact) => {
     const { contacts } = this.state;
@@ -28,7 +35,9 @@ class App extends Component {
     const check = this.checkContact(newContact);
     if (!check) {
       const { contacts } = this.state;
-      this.setState({ contacts: [...contacts, newContact] });
+      this.setState({
+        contacts: [...contacts, newContact],
+      });
     } else {
       alert(`${newContact.name} is already in contacts`);
     }
@@ -45,6 +54,12 @@ class App extends Component {
   };
 
   render() {
+    const { contacts, filter } = this.state;
+    const normalizedFilter = filter.toLowerCase();
+    const visibleContacts = contacts.filter((contact) =>
+      contact.name.toLowerCase().includes(normalizedFilter),
+    );
+
     return (
       <div className={css["container"]}>
         <h1>Phonebook</h1>
@@ -53,9 +68,9 @@ class App extends Component {
         <h2>Contacts</h2>
         <Filter changeHandler={this.changeFilterValue} />
         <ContactList
-          filter={this.state.filter}
-          contacts={this.state.contacts}
-          deleteFunction={this.deleteUser}></ContactList>
+          contacts={visibleContacts}
+          deleteFunction={this.deleteUser}
+        />
       </div>
     );
   }

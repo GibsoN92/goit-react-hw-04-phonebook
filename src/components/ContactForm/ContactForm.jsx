@@ -11,20 +11,25 @@ const INITIAL_STATE = {
 class ContactForm extends Component {
   state = { ...INITIAL_STATE };
 
+  handleChange = (e) => {
+    const { name, value } = e.target;
+    this.setState({ [name]: value });
+  };
+
   handleSubmit = (e) => {
     e.preventDefault();
 
-    const form = e.currentTarget;
-    const name = form.elements.name.value;
-    const number = form.elements.number.value;
+    const { name, number } = this.state;
     const id = nanoid();
 
     this.props.onSubmit({ id, name, number });
 
-    form.reset();
+    this.setState({ ...INITIAL_STATE });
   };
 
   render() {
+    const { name, number } = this.state;
+
     return (
       <form onSubmit={this.handleSubmit} className={css["form-container"]}>
         <label htmlFor="name" id="label">
@@ -36,6 +41,8 @@ class ContactForm extends Component {
           pattern="^[a-zA-Z '\-]+$"
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
+          value={name}
+          onChange={this.handleChange}
         />
         <label htmlFor="number" id="label">
           Number
@@ -46,6 +53,8 @@ class ContactForm extends Component {
           pattern="^\+?[0-9\(\) \-]+$"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
+          value={number}
+          onChange={this.handleChange}
         />
         <button type="submit">Add contact</button>
       </form>

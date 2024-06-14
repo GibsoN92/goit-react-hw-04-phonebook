@@ -10,7 +10,8 @@ const Filter = ({ changeHandler }) => {
         type="text"
         name="filter"
         onChange={changeHandler}
-        className={css["filter-input"]}></input>
+        className={css["filter-input"]}
+      />
     </div>
   );
 };
